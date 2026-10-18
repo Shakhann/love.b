@@ -243,6 +243,25 @@ body.shake #terminal-scene{animation:shakeX .6s linear infinite}
 }
 #finale-scene.active .f-line1{animation:fRise 2.4s 1.5s cubic-bezier(.25,.6,.25,1) both}
 #finale-scene.active .f-line2{animation:fRise 2.4s 3s cubic-bezier(.25,.6,.25,1) both}
+#replay{
+  position:absolute;bottom:5.5vh;left:50%;transform:translateX(-50%);
+  z-index:6;font-family:inherit;font-size:.72rem;font-weight:600;
+  letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(61,255,124,.5);background:rgba(61,255,124,.05);
+  border:1px solid rgba(61,255,124,.3);border-radius:3px;
+  padding:11px 22px;cursor:pointer;
+  transition:color .35s ease,border-color .35s ease,background .35s ease,box-shadow .35s ease;
+  animation:replayBreath 3.2s ease-in-out infinite;
+}
+#replay:hover{
+  color:rgba(185,255,208,.95);border-color:rgba(61,255,124,.7);
+  background:rgba(61,255,124,.1);box-shadow:0 0 22px rgba(61,255,124,.25);
+}
+@keyframes replayBreath{0%,100%{opacity:.55}50%{opacity:1}}
+/* мигновенный сброс при рестарте (без переходных вспышек) */
+body.resetting *,body.resetting *::before,body.resetting *::after{
+  transition:none !important;animation:none !important;
+}
 
 /* ================= СТАРТОВЫЙ ЭКРАН ================= */
 #start{
@@ -314,6 +333,7 @@ body.shake #terminal-scene{animation:shakeX .6s linear infinite}
     <p class="f-line1"><span class="prompt">&gt;</span>Өмірімде бар болғаныңа рақмет, жаным.</p>
     <p class="f-line2">Мен сені қатты жақсы көремін ❤️</p>
   </div>
+  <button id="replay" type="button">↻ басынан қайта</button>
 </div>
 
 <noscript>
@@ -503,56 +523,56 @@ function typeLine(text, {speed=20, cls, done} = {}){
 
 /* длинная интригующая загрузка: 14 команд */
 const SCRIPT = [
-  { text: '> [ BOOT ] Жүйені инициализациялау... 100%', speed: 9, pre: 180 },
-  { text: '> [ KERNEL ] Негізгі ядроны жүктеу... Орындалды.', speed: 10, pre: 200 },
-  { text: '> [ HARDWARE ] Жүрек соғысының сенсорларын тексеру... OK.', speed: 9, pre: 220 },
-  { text: '> [ MEMORY ] Естеліктер архивін ашу...', speed: 9, pre: 200 },
-  { text: '> [ MODULE ] Жасанды интеллект модульдері жүктелуде...', speed: 11, pre: 300 },
-  { text: '> [ NETWORK ] Дүниежүзілік сезімдер желісіне қосылу... Сәтті.', speed: 10, pre: 260, fx: 'ok' },
-  { text: '> [ PING ] Серверден жауап күтілуде... 2ms.', speed: 9, pre: 200 },
-  { text: '> [ SECURITY ] Биометриялық тексеру басталды...', speed: 10, pre: 300 },
-  { text: '> [ SCAN ] Көз қарашығын сканерлеу... Сәйкестік табылды.', speed: 11, pre: 300, fx: 'ok' },
-  { text: '> [ AUTH ] Пароль енгізу: ************', speed: 13, pre: 500 },
-  { text: '> [ DENIED ] Қате пароль. Рұқсат етілмейді.', speed: 13, pre: 600, fx: 'denied', cls: 'warn' },
-  { text: '> [ HACK ] Қорғаныс жүйелерін бұзу хаттамасын іске қосу...', speed: 10, pre: 500 },
-  { text: '> [ BRUTE-FORCE ] Махаббат кілттерін іздеу... [||||||||||] 100%', speed: 9, pre: 550 },
-  { text: '> [ BYPASS ] Firewall айналып өту... Done.', speed: 8, pre: 220 },
-  { text: '> [ SYSTEM ] Рұқсат етілді.', speed: 11, pre: 450, fx: 'ok' },
-  { text: '> [ MOUNT ] Сезімдер дисктерін орнату...', speed: 9, pre: 220 },
-  { text: '> [ LOAD ] Блок #001: Алғашқы кездесу... Жүктелді.', speed: 8, pre: 180 },
-  { text: '> [ LOAD ] Блок #002: Бірінші күлкі... Жүктелді.', speed: 8, pre: 180 },
-  { text: '> [ LOAD ] Блок #003: Қол ұстасу сәті... Жүктелді.', speed: 8, pre: 220 },
-  { text: '> [ SCAN ] Әлемдегі ең сұлу қызды іздеу процесі іске қосылды...', speed: 13, pre: 600 },
-  { text: '> [ RADAR ] Солтүстік жарты шарды сканерлеу... 0 нәтиже.', speed: 9, pre: 260 },
-  { text: '> [ RADAR ] Оңтүстік жарты шарды сканерлеу... 0 нәтиже.', speed: 9, pre: 260 },
-  { text: '> [ RADAR ] Дәл қазіргі локацияны сканерлеу... 1 объект табылды.', speed: 10, pre: 500, fx: 'ok' },
-  { text: '> [ MATCH ] Анализ... Сәйкестік: 99.999%', speed: 11, pre: 600, fx: 'found' },
-  { text: '> [ TARGET ] Объекттің кодтық атауы: "Менің махаббатым".', speed: 11, pre: 550, fx: 'found' },
-  { text: '> [ CONNECT ] Жүректен жүрекке тікелей арна құру...', speed: 11, pre: 450 },
-  { text: '> [ UPLOAD ] Эмоциялар пакетін жіберу... 45%... 89%... 100%.', speed: 10, pre: 500, fx: 'upload' },
-  { text: '> [ EXTRACT ] Бірге өткізген бақытты сәттерді бейнелеу...', speed: 10, pre: 300 },
-  { text: '> [ SYNC ] Ойларды синхрондау...', speed: 8, pre: 220 },
-  { text: '> [ SYNC ] Армандарды синхрондау...', speed: 8, pre: 220 },
-  { text: '> [ ANALYZE ] Сезімдерді талдау басталды...', speed: 10, pre: 300 },
-  { text: '> [ CALIBRATE ] Жүрек соғысының жиілігін калибрлеу...', speed: 10, pre: 450, fx: 'beat' },
-  { text: '> [ PULSE ] BPM: 85... 95... 110...', speed: 11, pre: 500, fx: 'pulse' },
-  { text: '> [ WARNING ] Соғу жиілігі тым жоғары.', speed: 11, pre: 450, fx: 'warn', cls: 'caution' },
-  { text: '> [ PROCESS ] Қамқорлық деңгейін өлшеу... Шексіздік (∞).', speed: 9, pre: 260 },
-  { text: '> [ PROCESS ] Адалдық алгоритмін тексеру... Минсіз.', speed: 9, pre: 260 },
-  { text: '> [ PROCESS ] Сұлулық индексі... Жүйе есептей алмайды (Overflow).', speed: 10, pre: 400, fx: 'denied' },
-  { text: '> [ OVERLOAD ] Ескерту: Махаббат деңгейі шектен тыс жоғары!', speed: 11, pre: 550, fx: 'warn', cls: 'warn' },
-  { text: '> [ OVERLOAD ] Жүйе қызып кетті...', speed: 9, pre: 260, cls: 'warn' },
-  { text: '> [ COOLING ] Суыту жүйесі іске қосылды... Нәтижесіз.', speed: 9, pre: 280 },
-  { text: '> [ ERROR ] Сезімдерді тоқтату мүмкін емес.', speed: 11, pre: 500, fx: 'denied', cls: 'warn' },
-  { text: '> [ SAVE ] Осы сәтті мәңгілікке сақтау... Saved.', speed: 11, pre: 450, fx: 'ok' },
-  { text: '> [ BACKUP ] Жүрекке көшірме жасау... Done.', speed: 8, pre: 220 },
-  { text: '> [ FINAL ] Барлық модульдер сәтті орнатылды.', speed: 9, pre: 420, fx: 'ok' },
-  { text: '> [ READY ] Басты операцияға дайындық...', speed: 9, pre: 420, fx: 'ok' },
-  { text: '> [ INITIATE ] Романтика протоколын қосу.', speed: 10, pre: 480 },
-  { text: '> [ EXECUTE ] Виртуалды қабырғаларды бұзу... 3...', speed: 13, pre: 600, fx: 'count' },
-  { text: '> [ EXECUTE ] 2...', speed: 13, pre: 420, fx: 'count' },
-  { text: '> [ EXECUTE ] 1...', speed: 13, pre: 420, fx: 'count' },
-  { text: '> [ DECODE ] Сезімдерді барлық тілге аудару процесі...', speed: 11, pre: 700, fx: 'found' },
+  { text: '> [ BOOT ] Жүйені инициализациялау... 100%', speed: 7, pre: 140 },
+  { text: '> [ KERNEL ] Негізгі ядроны жүктеу... Орындалды.', speed: 8, pre: 160 },
+  { text: '> [ HARDWARE ] Жүрек соғысының сенсорларын тексеру... OK.', speed: 7, pre: 180 },
+  { text: '> [ MEMORY ] Естеліктер архивін ашу...', speed: 7, pre: 160 },
+  { text: '> [ MODULE ] Жасанды интеллект модульдері жүктелуде...', speed: 9, pre: 240 },
+  { text: '> [ NETWORK ] Дүниежүзілік сезімдер желісіне қосылу... Сәтті.', speed: 8, pre: 200, fx: 'ok' },
+  { text: '> [ PING ] Серверден жауап күтілуде... 2ms.', speed: 7, pre: 160 },
+  { text: '> [ SECURITY ] Биометриялық тексеру басталды...', speed: 8, pre: 240 },
+  { text: '> [ SCAN ] Көз қарашығын сканерлеу... Сәйкестік табылды.', speed: 9, pre: 240, fx: 'ok' },
+  { text: '> [ AUTH ] Пароль енгізу: ************', speed: 10, pre: 420 },
+  { text: '> [ DENIED ] Қате пароль. Рұқсат етілмейді.', speed: 10, pre: 500, fx: 'denied', cls: 'warn' },
+  { text: '> [ HACK ] Қорғаныс жүйелерін бұзу хаттамасын іске қосу...', speed: 8, pre: 420 },
+  { text: '> [ BRUTE-FORCE ] Махаббат кілттерін іздеу... [||||||||||] 100%', speed: 7, pre: 460 },
+  { text: '> [ BYPASS ] Firewall айналып өту... Done.', speed: 6, pre: 170 },
+  { text: '> [ SYSTEM ] Рұқсат етілді.', speed: 9, pre: 380, fx: 'ok' },
+  { text: '> [ MOUNT ] Сезімдер дисктерін орнату...', speed: 7, pre: 170 },
+  { text: '> [ LOAD ] Блок #001: Алғашқы кездесу... Жүктелді.', speed: 6, pre: 140 },
+  { text: '> [ LOAD ] Блок #002: Бірінші күлкі... Жүктелді.', speed: 6, pre: 140 },
+  { text: '> [ LOAD ] Блок #003: Қол ұстасу сәті... Жүктелді.', speed: 6, pre: 170 },
+  { text: '> [ SCAN ] Әлемдегі ең сұлу қызды іздеу процесі іске қосылды...', speed: 10, pre: 500 },
+  { text: '> [ RADAR ] Солтүстік жарты шарды сканерлеу... 0 нәтиже.', speed: 7, pre: 200 },
+  { text: '> [ RADAR ] Оңтүстік жарты шарды сканерлеу... 0 нәтиже.', speed: 7, pre: 200 },
+  { text: '> [ RADAR ] Дәл қазіргі локацияны сканерлеу... 1 объект табылды.', speed: 8, pre: 420, fx: 'ok' },
+  { text: '> [ MATCH ] Анализ... Сәйкестік: 99.999%', speed: 9, pre: 500, fx: 'found' },
+  { text: '> [ TARGET ] Объекттің кодтық атауы: "Менің махаббатым".', speed: 9, pre: 460, fx: 'found' },
+  { text: '> [ CONNECT ] Жүректен жүрекке тікелей арна құру...', speed: 9, pre: 380 },
+  { text: '> [ UPLOAD ] Эмоциялар пакетін жіберу... 45%... 89%... 100%.', speed: 8, pre: 420, fx: 'upload' },
+  { text: '> [ EXTRACT ] Бірге өткізген бақытты сәттерді бейнелеу...', speed: 8, pre: 240 },
+  { text: '> [ SYNC ] Ойларды синхрондау...', speed: 6, pre: 170 },
+  { text: '> [ SYNC ] Армандарды синхрондау...', speed: 6, pre: 170 },
+  { text: '> [ ANALYZE ] Сезімдерді талдау басталды...', speed: 8, pre: 240 },
+  { text: '> [ CALIBRATE ] Жүрек соғысының жиілігін калибрлеу...', speed: 8, pre: 380, fx: 'beat' },
+  { text: '> [ PULSE ] BPM: 85... 95... 110...', speed: 9, pre: 420, fx: 'pulse' },
+  { text: '> [ WARNING ] Соғу жиілігі тым жоғары.', speed: 9, pre: 380, fx: 'warn', cls: 'caution' },
+  { text: '> [ PROCESS ] Қамқорлық деңгейін өлшеу... Шексіздік (∞).', speed: 7, pre: 200 },
+  { text: '> [ PROCESS ] Адалдық алгоритмін тексеру... Минсіз.', speed: 7, pre: 200 },
+  { text: '> [ PROCESS ] Сұлулық индексі... Жүйе есептей алмайды (Overflow).', speed: 8, pre: 330, fx: 'denied' },
+  { text: '> [ OVERLOAD ] Ескерту: Махаббат деңгейі шектен тыс жоғары!', speed: 9, pre: 460, fx: 'warn', cls: 'warn' },
+  { text: '> [ OVERLOAD ] Жүйе қызып кетті...', speed: 7, pre: 200, cls: 'warn' },
+  { text: '> [ COOLING ] Суыту жүйесі іске қосылды... Нәтижесіз.', speed: 7, pre: 220 },
+  { text: '> [ ERROR ] Сезімдерді тоқтату мүмкін емес.', speed: 9, pre: 420, fx: 'denied', cls: 'warn' },
+  { text: '> [ SAVE ] Осы сәтті мәңгілікке сақтау... Saved.', speed: 9, pre: 380, fx: 'ok' },
+  { text: '> [ BACKUP ] Жүрекке көшірме жасау... Done.', speed: 6, pre: 170 },
+  { text: '> [ FINAL ] Барлық модульдер сәтті орнатылды.', speed: 7, pre: 350, fx: 'ok' },
+  { text: '> [ READY ] Басты операцияға дайындық...', speed: 7, pre: 350, fx: 'ok' },
+  { text: '> [ INITIATE ] Романтика протоколын қосу.', speed: 8, pre: 400 },
+  { text: '> [ EXECUTE ] Виртуалды қабырғаларды бұзу... 3...', speed: 10, pre: 500, fx: 'count' },
+  { text: '> [ EXECUTE ] 2...', speed: 10, pre: 350, fx: 'count' },
+  { text: '> [ EXECUTE ] 1...', speed: 10, pre: 350, fx: 'count' },
+  { text: '> [ DECODE ] Сезімдерді барлық тілге аудару процесі...', speed: 9, pre: 560, fx: 'found' },
 ];
 
 async function runSequence(){
@@ -806,7 +826,6 @@ function shatter(){
     layer.classList.add('fade');
     document.body.classList.add('finale');
     $('#finale-scene').classList.add('active');
-    finalePad();
     initHeart();
   }, reduced ? 350 : 950);
   setTimeout(() => {
@@ -818,6 +837,8 @@ function shatter(){
 
 /* ================= СЦЕНА 4: НЕОНОВОЕ СЕРДЦЕ ИЗ ЧАСТИЦ ================= */
 let heartStarted = false;
+let heartResizeBound = false;
+function stopHeart(){ heartStarted = false; }
 function initHeart(){
   if(heartStarted) return;
   heartStarted = true;
@@ -962,7 +983,7 @@ function initHeart(){
   }
 
   build();
-  addEventListener('resize', () => build());
+  if(!heartResizeBound){ addEventListener('resize', () => build()); heartResizeBound = true; }
 
   if(reduced){
     draw(0);
@@ -985,9 +1006,39 @@ startEl.addEventListener('pointerdown', () => {
   $('#terminal-scene').classList.add('boot');
   setTimeout(runSequence, reduced ? 100 : 800);
 });
+/* ================= RESTART: басынан қайта ================= */
+function restart(){
+  stopHeart();
+  stopPad();
+  document.body.classList.add('resetting');
+  document.body.classList.remove('finale','shake');
+  document.querySelector('#finale-scene').classList.remove('active');
+  const ts = $('#terminal-scene');
+  ts.classList.remove('fade-out','danger','boot');
+  $('#terminal').classList.remove('washed');
+  $('#lines').innerHTML = '';
+  const big = $('#big');
+  big.className = 'big';
+  big.textContent = '';
+  stopRain();
+  $('#rain').classList.remove('on');
+  const gl = $('#glitch-layer');
+  gl.className = '';
+  gl.innerHTML = '';
+  gl.style.display = '';
+  document.querySelectorAll('#crack path').forEach(p => p.setAttribute('d',''));
+  $('#flash').classList.remove('on');
+  void document.body.offsetWidth;
+  document.body.classList.remove('resetting');
+  void ts.offsetWidth;
+  ts.classList.add('boot');
+  setTimeout(runSequence, reduced ? 100 : 800);
+}
+$('#replay').addEventListener('click', restart);
 
 /* тест-хуки (консоль браузера) */
 window.__demo = {
+  restart(){ restart(); },
   toFinale(){
     startEl.classList.add('off');
     $('#terminal-scene').classList.add('fade-out');
@@ -995,7 +1046,6 @@ window.__demo = {
     $('#finale-scene').classList.add('active');
     initAudio();
     if(actx && actx.state === 'suspended') actx.resume();
-    finalePad();
     initHeart();
   },
   wash(){
