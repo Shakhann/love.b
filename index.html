@@ -8,7 +8,7 @@
 <title>♥ love.B</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Noto+Serif:wght@500;600;700&display=swap" rel="stylesheet"/>
 <style>
 /* ================================================================
    love.B v3 — «hacker terminal → matrix rain → particle heart»
@@ -90,7 +90,8 @@ body{
 /* ================= СЦЕНА 2: МУЛЬТИБАЯЧНЫЕ СЛОВА ================= */
 .big{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-weight:700;letter-spacing:.02em;color:#eafff0;text-align:center;
+  font-family:'Playfair Display','Noto Serif',Georgia,serif;
+  font-weight:600;letter-spacing:.01em;color:#eafff0;text-align:center;
   padding:0 4vw;white-space:normal;
   opacity:0;z-index:4;pointer-events:none;
 }
@@ -692,7 +693,7 @@ function fitPhrase(el, text){
        (c >= 0x3040 && c <= 0x30FF) || (c >= 0xF900 && c <= 0xFAFF)) w += 1.02;
     else if(c >= 0x0590 && c <= 0x06FF) w += .52;
     else if((c >= 0x0300 && c <= 0x036F) || (c >= 0x093E && c <= 0x0951)) w += .08;
-    else w += .62;
+    else w += .52;
   }
   const size = Math.min(11, 92 / w);
   el.style.fontSize = `clamp(1.1rem, ${size}vw, 8rem)`;
@@ -881,13 +882,13 @@ function initHeart(){
     const g = glowSpr.getContext('2d');
     const c = GLOW_SIZE/2;
     const outer = g.createRadialGradient(c,c, GLOW_R0*.2, c,c, GLOW_R0*1.95);
-    outer.addColorStop(0, 'rgba(124,58,237,.16)');
-    outer.addColorStop(.5, 'rgba(61,255,124,.06)');
+    outer.addColorStop(0, 'rgba(124,58,237,.19)');
+    outer.addColorStop(.5, 'rgba(61,255,124,.07)');
     outer.addColorStop(1, 'rgba(0,0,0,0)');
     g.fillStyle = outer;
     g.fillRect(0,0,GLOW_SIZE,GLOW_SIZE);
     const inner = g.createRadialGradient(c,c, 0, c,c, GLOW_R0*1.08);
-    inner.addColorStop(0, 'rgba(61,255,124,.15)');
+    inner.addColorStop(0, 'rgba(61,255,124,.22)');
     inner.addColorStop(1, 'rgba(61,255,124,0)');
     g.fillStyle = inner;
     g.fillRect(0,0,GLOW_SIZE,GLOW_SIZE);
@@ -909,7 +910,7 @@ function initHeart(){
 
     parts = [];
     const mobile = W < 600;
-    const target = Math.min(mobile ? 2600 : 5200,
+    const target = Math.min(mobile ? 2400 : 4200,
                             Math.max(1200, Math.round(Math.PI*R*R*.6/(mobile ? 4.2 : 3.4))));
     let guard = 0;
     while(parts.length < target && guard < target*40){
@@ -928,13 +929,29 @@ function initHeart(){
         const lv = Math.min(1, light*.75 + core*.55);
         parts.push({
           ux, uy,
-          s: 2.6 + Math.random()*3.4,
-          a: .35 + Math.random()*.5,
+          s: 3.6 + Math.random()*4.4,
+          a: .45 + Math.random()*.5,
           tw: .5 + Math.random()*1.6,
           ph: Math.random()*6.283,
           spr: Math.min(SPR_N-1, Math.round(lv*(SPR_N-1)))
         });
       }
+    }
+    /* плотное ядро — «объём» света в центре (мелкие яркие частицы) */
+    const coreN = Math.round(target*.35);
+    for(let i=0;i<coreN;i++){
+      const ux = (Math.random()*2-1)*.72;
+      const uy = (Math.random()*2-1)*.62 + .1;
+      if(heartF(ux,uy) > 0) continue;
+      const cc = Math.max(0, 1 - Math.hypot(ux, uy-.1)*1.4);
+      parts.push({
+        ux, uy,
+        s: 2.4 + Math.random()*3.0,
+        a: .55 + Math.random()*.45,
+        tw: .6 + Math.random()*1.8,
+        ph: Math.random()*6.283,
+        spr: Math.min(SPR_N-1, Math.round((.45 + .55*cc)*(SPR_N-1)))
+      });
     }
 
     stars = [];
