@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
+<meta name="theme-color" content="#020503"/>
+<meta name="theme-color" content="#120826"/>
+<title>♥ love.B</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet"/>
+<style>
+/* ================================================================
+   love.B v3 — «hacker terminal → matrix rain → particle heart»
+   Один файл. Все анимации: transform/opacity (60 FPS).
+   ================================================================ */
+:root{
+  --green:#3dff7c;
+  --green-dim:#1e6b40;
+  --green-soft:#d6ffe6;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#0a0512}
+body{
+  font-family:'JetBrains Mono',Consolas,Menlo,'Courier New',monospace;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;touch-action:manipulation;
+}
+
+/* ================= 1-САХНА: ТЕРМИНАЛ ================= */
+#terminal-scene{
+  position:fixed;inset:0;z-index:5;background:#020503;
+  transition:opacity 1.8s ease, filter 1.8s ease;
+}
+#terminal-scene.fade-out{opacity:0;filter:blur(3px)}
+
+.term{position:absolute;inset:0;padding:8vh 5vw 4vh;z-index:2;transition:opacity 1.3s ease}
+.term.washed{opacity:0}
+#terminal-scene.boot .term{animation:powerOn .75s cubic-bezier(.2,.8,.3,1) both;transform-origin:center}
+@keyframes powerOn{
+  0%  {transform:scaleY(.004) scaleX(.5);filter:brightness(9) saturate(.3)}
+  35% {transform:scaleY(.012) scaleX(1);filter:brightness(5)}
+  62% {transform:scaleY(1);filter:brightness(1.7)}
+  100%{transform:none;filter:none}
+}
+
+.hdr{
+  position:absolute;top:16px;left:20px;right:20px;
+  display:flex;justify-content:space-between;
+  color:rgba(61,255,124,.35);font-size:.68rem;letter-spacing:.08em;
+}
+.lines{z-index:2}
+.tl{
+  color:var(--green-soft);
+  text-shadow:0 0 6px rgba(61,255,124,.45);
+  font-size:clamp(.66rem,2vw,.92rem);
+  line-height:1.72;white-space:pre-wrap;word-break:break-word;
+}
+.tl.warn{color:#ffb9b9;text-shadow:0 0 9px rgba(255,70,80,.65)}
+#cursor{
+  display:inline-block;width:.62em;height:1.12em;background:var(--green);
+  margin-left:3px;vertical-align:text-bottom;
+  box-shadow:0 0 8px rgba(61,255,124,.8);
+  animation:blink 1.06s steps(1) infinite;
+}
+@keyframes blink{0%,55%{opacity:1}56%,100%{opacity:0}}
+
+/* «ОПАСНОСТЬ» — красная вспышка на OVERLOAD */
+.danger-veil{
+  position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0;
+  background:radial-gradient(ellipse at center,rgba(255,45,70,.20),rgba(255,45,70,.06) 60%,transparent);
+}
+#terminal-scene.danger .danger-veil{animation:dangerFlash .6s ease-out both}
+@keyframes dangerFlash{0%{opacity:0}22%{opacity:1}100%{opacity:0}}
+
+/* ================= MATRIX RAIN (Canvas) ================= */
+#rain{
+  position:absolute;inset:0;width:100%;height:100%;
+  z-index:3;opacity:0;transition:opacity .8s ease;pointer-events:none;
+}
+#rain.on{opacity:.92}
+
+/* ================= СЦЕНА 2: МУЛЬТИБАЯЧНЫЕ СЛОВА ================= */
+.big{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-weight:700;letter-spacing:.02em;color:#eafff0;text-align:center;
+  padding:0 4vw;white-space:normal;
+  opacity:0;z-index:4;pointer-events:none;
+}
+.big.gone{opacity:0 !important;transition:opacity .25s ease}
+.big.show{opacity:1}
+.big.flick{animation:phraseIn .36s cubic-bezier(.3,.7,.3,1) both}
+.big.swap-out{opacity:0 !important;transition:opacity .09s ease}
+@keyframes phraseIn{
+  0%  {opacity:0;transform:scale(1.03);text-shadow:0 0 8px rgba(61,255,124,.25)}
+  100%{opacity:1;transform:scale(1);text-shadow:0 0 22px rgba(61,255,124,.9),0 0 46px rgba(61,255,124,.4)}
+}
+.big.show-final{opacity:1;animation:finalHold 1.3s ease-out both}
+@keyframes finalHold{
+  0%  {opacity:1;text-shadow:0 0 22px rgba(61,255,124,.9)}
+  45% {opacity:.85}
+  100%{opacity:1;text-shadow:0 0 30px rgba(255,120,200,.9),0 0 60px rgba(255,80,180,.55),0 0 90px rgba(61,255,124,.5)}
+}
+
+/* CRT-эффекты (только transform/opacity) */
+.crt-scanlines{
+  position:absolute;inset:0;pointer-events:none;z-index:5;opacity:.5;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 1px,transparent 1px 3px);
+}
+.crt-roll{
+  position:absolute;left:0;right:0;top:0;height:150px;pointer-events:none;z-index:5;
+  background:linear-gradient(180deg,transparent,rgba(120,255,170,.06),transparent);
+  animation:rollY 6.5s linear infinite;
+}
+@keyframes rollY{from{transform:translateY(-160px)}to{transform:translateY(110vh)}}
+.crt-vignette{
+  position:absolute;inset:0;pointer-events:none;z-index:5;
+  background:radial-gradient(ellipse at center,transparent 52%,rgba(0,0,0,.55) 100%);
+}
+.crt-flicker{
+  position:absolute;inset:0;pointer-events:none;z-index:5;
+  background:rgba(140,255,180,.04);animation:crtFlick 4s linear infinite;
+}
+@keyframes crtFlick{
+  0%,100%{opacity:.5}8%{opacity:.95}12%{opacity:.4}30%{opacity:.7}
+  34%{opacity:.95}60%{opacity:.55}78%{opacity:.85}82%{opacity:.45}
+}
+
+/* ================= СЦЕНА 3: ГЛИТЧ / СЛОМ ================= */
+#glitch-layer{
+  position:fixed;inset:0;z-index:50;display:none;overflow:hidden;
+  pointer-events:none;background:transparent;
+}
+#glitch-layer.fade{opacity:0;transition:opacity .55s ease}
+.band{position:absolute;inset:0;animation:bandFly 1.4s cubic-bezier(.3,.5,.35,1) forwards}
+@keyframes bandFly{
+  0%  {transform:translate(0,0) rotate(0deg);opacity:1;filter:none}
+  15% {transform:translate(calc(var(--dx)*.25),calc(var(--dy)*.4)) rotate(calc(var(--rot)*.25));opacity:.92}
+  30% {transform:translate(calc(var(--dx)*.4),var(--dy)) rotate(var(--rot));opacity:1}
+  42% {opacity:.55;filter:brightness(1.5) hue-rotate(50deg)}
+  58% {opacity:1}
+  100%{transform:translate(calc(var(--dx)*1.15),calc(var(--dy)*2.4 + 38vh)) rotate(calc(var(--rot)*1.8));opacity:0;filter:brightness(1.35)}
+}
+.ghost{position:absolute;inset:0;mix-blend-mode:screen;opacity:0}
+.ghost *{color:inherit !important;text-shadow:none !important}
+.ghost-r{color:#ff2d55;text-shadow:0 0 10px rgba(255,45,85,.9);animation:ghostR .14s steps(2,end) infinite}
+.ghost-b{color:#00e5ff;text-shadow:0 0 10px rgba(0,229,255,.9);animation:ghostB .12s steps(2,end) infinite}
+@keyframes ghostR{0%,100%{opacity:.45;transform:translateX(-7px)}50%{opacity:.14;transform:translateX(-15px)}}
+@keyframes ghostB{0%,100%{opacity:.4;transform:translateX(7px)}50%{opacity:.12;transform:translateX(14px)}}
+.glitch-noise{
+  position:absolute;inset:0;opacity:.2;background-size:160px 160px;
+  animation:noiseShift .18s steps(3) infinite;
+}
+@keyframes noiseShift{
+  0%{background-position:0 0}33%{background-position:-60px 40px}
+  66%{background-position:50px -30px}100%{background-position:0 0}
+}
+
+/* «трещина» — вспышка ломаных линий */
+#crack{position:fixed;inset:0;width:100%;height:100%;z-index:55;pointer-events:none;opacity:0;transition:opacity .25s}
+#crack.on{opacity:1;transition:opacity .04s}
+#crack path{
+  fill:none;stroke:#fff;stroke-width:2.2;stroke-linejoin:round;
+  filter:drop-shadow(0 0 6px #fff) drop-shadow(0 0 16px rgba(140,255,190,.8));
+}
+
+/* жұмсақ лаванда ақ вспышка (жұмсақ, тонға сай) */
+#flash{
+  position:fixed;inset:0;z-index:60;pointer-events:none;opacity:0;
+  background:radial-gradient(circle at 50% 45%,#ffffff 0%,#e6dcff 45%,#8f7bd8 100%);
+  transition:opacity .85s ease;
+}
+#flash.on{opacity:.72;transition:opacity .14s ease}
+
+@keyframes shakeX{
+  0%,100%{transform:translate(0,0)}15%{transform:translate(-5px,3px)}
+  30%{transform:translate(4px,-4px)}45%{transform:translate(-4px,-2px)}
+  60%{transform:translate(4px,3px)}75%{transform:translate(-2px,2px)}90%{transform:translate(3px,-2px)}
+}
+body.shake #terminal-scene{animation:shakeX .6s linear infinite}
+
+/* ================= СЦЕНА 4: ФИНАЛ (хакерская романтика) ================= */
+#finale-scene{
+  position:fixed;inset:0;z-index:4;opacity:0;
+  transition:opacity 1.8s ease;
+  /* қара фон — 1-ші сценаның (терминал) фонымен жалғасады, ортасында бәсең жасыл жарқылы */
+  background:radial-gradient(ellipse at 50% 42%,#0a1710 0%,#06100b 42%,#030806 70%,#020503 100%);
+  overflow:hidden;
+}
+#finale-scene.active{opacity:1}
+
+/* полупрозрачная зелёная «хакерская» сетка */
+.hacker-grid{
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    repeating-linear-gradient(0deg,rgba(61,255,124,.065) 0 1px,transparent 1px 46px),
+    repeating-linear-gradient(90deg,rgba(61,255,124,.065) 0 1px,transparent 1px 46px);
+  -webkit-mask-image:radial-gradient(ellipse at 50% 45%,#000 25%,transparent 88%);
+  mask-image:radial-gradient(ellipse at 50% 45%,#000 25%,transparent 88%);
+  animation:gridPulse 5s ease-in-out infinite;
+}
+@keyframes gridPulse{0%,100%{opacity:.6}50%{opacity:1}}
+
+/* медленный зелёный скан по финалу — отсылка к CRT */
+.fin-roll{
+  position:absolute;left:0;right:0;top:0;height:220px;pointer-events:none;z-index:1;
+  background:linear-gradient(180deg,transparent,rgba(61,255,124,.045),transparent);
+  animation:rollY 9s linear infinite;
+}
+
+#heart-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:2}
+
+.final{
+  position:absolute;left:0;right:0;top:60%;z-index:3;
+  display:flex;flex-direction:column;align-items:center;
+  gap:clamp(10px,2.2vh,18px);text-align:center;padding:0 20px;
+}
+.f-line1{
+  font-family:'JetBrains Mono',Consolas,monospace;
+  font-weight:500;font-size:clamp(1.35rem,3.8vw,2.4rem);
+  color:#7dffb0;letter-spacing:.02em;line-height:1.5;max-width:30ch;
+  text-shadow:0 0 12px rgba(61,255,124,.6),0 0 38px rgba(61,255,124,.3);
+  opacity:0;
+}
+.f-line1 .prompt{color:rgba(61,255,124,.55);font-weight:700;margin-right:.55em}
+.f-line2{
+  font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+  font-weight:500;font-style:italic;font-size:clamp(1.25rem,3.2vw,2.1rem);
+  color:#fff;line-height:1.3;
+  text-shadow:0 0 20px rgba(210,180,255,.4);
+  opacity:0;
+}
+@keyframes fRise{
+  from{opacity:0;transform:translateY(18px)}
+  to  {opacity:1;transform:none}
+}
+#finale-scene.active .f-line1{animation:fRise 2.4s 1.5s cubic-bezier(.25,.6,.25,1) both}
+#finale-scene.active .f-line2{animation:fRise 2.4s 3s cubic-bezier(.25,.6,.25,1) both}
+
+/* ================= СТАРТОВЫЙ ЭКРАН ================= */
+#start{
+  position:fixed;inset:0;z-index:100;background:#020503;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  cursor:pointer;transition:opacity .6s ease;text-align:center;padding:24px;
+}
+#start.off{opacity:0;pointer-events:none}
+.s-line{color:var(--green-dim);font-size:clamp(.78rem,2.5vw,.95rem);line-height:1.9}
+.s-line b{color:var(--green);font-weight:700}
+.execute{
+  margin-top:28px;font-size:clamp(1.05rem,4vw,1.45rem);color:var(--green);
+  border:1px solid rgba(61,255,124,.5);padding:15px 38px;border-radius:4px;
+  animation:execPulse 1.7s ease-in-out infinite;
+  box-shadow:0 0 26px rgba(61,255,124,.14),inset 0 0 18px rgba(61,255,124,.06);
+}
+@keyframes execPulse{
+  0%,100%{box-shadow:0 0 26px rgba(61,255,124,.14),inset 0 0 18px rgba(61,255,124,.06);opacity:.85}
+  50%{box-shadow:0 0 46px rgba(61,255,124,.34),inset 0 0 26px rgba(61,255,124,.12);opacity:1}
+}
+.hint{font-size:.68rem;color:var(--green-dim);letter-spacing:.16em;margin-top:8px}
+
+/* ================= REDUCED MOTION ================= */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.25s !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Стартовый экран (тап также разрешает звук) -->
+<div id="start">
+  <div class="s-line">&gt; <b>love.B</b> v3.0 — жүрек дерекқоры</div>
+  <div class="s-line">&gt; [ READY ] Жүйе дайын.</div>
+  <div class="execute">[ EXECUTE ]</div>
+  <div class="hint">бастау үшін тыйрақтаңыз</div>
+</div>
+
+<!-- 1-САХНА: ТЕРМИНАЛ + MATRIX RAIN -->
+<div id="terminal-scene">
+  <div class="term" id="terminal">
+    <div class="hdr"><span>♥.sys — secure shell</span><span>user@heart</span></div>
+    <div id="lines" class="lines"></div>
+  </div>
+  <canvas id="rain"></canvas>
+  <div id="big" class="big" aria-hidden="true"></div>
+  <div class="danger-veil"></div>
+  <div class="crt-scanlines"></div>
+  <div class="crt-roll"></div>
+  <div class="crt-flicker"></div>
+  <div class="crt-vignette"></div>
+</div>
+
+<!-- 3-САХНА: ГЛИТЧ -->
+<div id="glitch-layer"></div>
+<svg id="crack"><path class="c1" d=""/><path class="c2" d=""/></svg>
+<div id="flash"></div>
+
+<!-- 4-САХНА: ФИНАЛ -->
+<div id="finale-scene">
+  <div class="hacker-grid"></div>
+  <div class="fin-roll"></div>
+  <canvas id="heart-canvas"></canvas>
+  <div class="final">
+    <p class="f-line1"><span class="prompt">&gt;</span>Өмірімде бар болғаныңа рақмет, жаным.</p>
+    <p class="f-line2">Мен сені қатты жақсы көремін ❤️</p>
+  </div>
+</div>
+
+<noscript>
+  <div style="position:fixed;inset:0;z-index:200;background:#020503;color:#3dff7c;display:flex;align-items:center;justify-content:center;font-family:monospace">
+    JavaScript қосу керек.
+  </div>
+</noscript>
+
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ================= ЗВУК (WebAudio, без UI) ================= */
+let actx = null, master = null;
+let padGain = null, padOscs = [];
+
+function initAudio(){
+  if(actx) return;
+  try{
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+    master = actx.createGain();
+    master.gain.value = .9;
+    master.connect(actx.destination);
+  }catch(e){}
+}
+function blip(freq, dur=.03, vol=.015, type='square'){
+  if(!actx) return;
+  try{
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001, actx.currentTime + dur);
+    o.connect(g); g.connect(master);
+    o.start(); o.stop(actx.currentTime + dur + .02);
+  }catch(e){}
+}
+function fxOk(){
+  [659.25, 880].forEach((f,i) => setTimeout(() => blip(f, .3, .05, 'sine'), i*110));
+}
+function fxFound(){
+  [523.25, 659.25, 783.99, 1046.5].forEach((f,i) => setTimeout(() => blip(f, .55, .05, 'sine'), i*100));
+}
+function fxBeat(){
+  [0, 150].forEach(d => setTimeout(() => blip(58, .14, .09, 'sine'), d));
+}
+function fxWarn(){
+  if(!actx) return;
+  try{
+    const t = actx.currentTime;
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(96, t);
+    o.frequency.linearRampToValueAtTime(68, t + .55);
+    g.gain.setValueAtTime(.07, t);
+    g.gain.exponentialRampToValueAtTime(.001, t + .6);
+    const l = actx.createOscillator(); l.frequency.value = 28;
+    const lg = actx.createGain(); lg.gain.value = .03;
+    l.connect(lg); lg.connect(g.gain);
+    o.connect(g); g.connect(master);
+    o.start(); l.start(); o.stop(t + .62); l.stop(t + .62);
+  }catch(e){}
+}
+function shatterSound(){
+  if(!actx) return;
+  try{
+    const t = actx.currentTime, dur = .75, sr = actx.sampleRate;
+    const buf = actx.createBuffer(1, sr*dur, sr), d = buf.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i] = (Math.random()*2-1) * Math.pow(1 - i/d.length, 2);
+    const src = actx.createBufferSource(); src.buffer = buf;
+    const f = actx.createBiquadFilter(); f.type='bandpass'; f.Q.value=1.2;
+    f.frequency.setValueAtTime(3800, t);
+    f.frequency.exponentialRampToValueAtTime(140, t + dur);
+    const g = actx.createGain();
+    g.gain.setValueAtTime(.28, t);
+    g.gain.exponentialRampToValueAtTime(.001, t + dur);
+    src.connect(f); f.connect(g); g.connect(master); src.start();
+
+    const o = actx.createOscillator(); o.type='sine';
+    o.frequency.setValueAtTime(130, t);
+    o.frequency.exponentialRampToValueAtTime(32, t + .55);
+    const og = actx.createGain();
+    og.gain.setValueAtTime(.3, t);
+    og.gain.exponentialRampToValueAtTime(.001, t + .6);
+    o.connect(og); og.connect(master); o.start(); o.stop(t + .65);
+  }catch(e){}
+}
+function finalePad(){
+  if(!actx) return;
+  stopPad();
+  try{
+    const t = actx.currentTime;
+    const g = actx.createGain(); g.gain.value = 0; g.connect(master);
+    g.gain.linearRampToValueAtTime(.05, t + 3);
+    const lfo = actx.createOscillator(); lfo.frequency.value = .07;
+    const lg = actx.createGain(); lg.gain.value = .02;
+    lfo.connect(lg); lg.connect(g.gain); lfo.start(); padOscs.push(lfo);
+    [196.00, 246.94, 293.66, 392.00].forEach(fr => {
+      const o = actx.createOscillator(); o.type='sine'; o.frequency.value = fr;
+      o.detune.value = Math.random()*8 - 4;
+      o.connect(g); o.start(); padOscs.push(o);
+    });
+    const s = actx.createOscillator(); s.type='sine'; s.frequency.value = 783.99;
+    const sg = actx.createGain(); sg.gain.value = .008;
+    const slfo = actx.createOscillator(); slfo.frequency.value = .11;
+    const slg = actx.createGain(); slg.gain.value = .005;
+    slfo.connect(slg); slg.connect(sg.gain);
+    s.connect(sg); sg.connect(g); s.start(); slfo.start();
+    padOscs.push(s, slfo);
+    padGain = g;
+  }catch(e){}
+}
+function stopPad(){
+  if(!actx) return;
+  try{
+    if(padGain){
+      padGain.gain.cancelScheduledValues(actx.currentTime);
+      padGain.gain.setTargetAtTime(0, actx.currentTime, .35);
+    }
+  }catch(e){}
+  padOscs.forEach(o => { try{ o.stop(); }catch(e){} });
+  padOscs = []; padGain = null;
+}
+
+/* ================= ТЕРМИНАЛ: ТИПАТОР ================= */
+const linesEl = $('#lines');
+const cursor = document.createElement('span');
+cursor.id = 'cursor';
+
+function addLine(cls){
+  const d = document.createElement('div');
+  d.className = 'tl' + (cls ? ' ' + cls : '');
+  linesEl.appendChild(d);
+  return d;
+}
+function typeLine(text, {speed=20, cls, done} = {}){
+  return new Promise(res => {
+    const d = addLine(cls);
+    d.appendChild(cursor);
+    let i = 0;
+    (function tick(){
+      if(i < text.length){
+        i++;
+        d.textContent = text.slice(0, i);
+        d.appendChild(cursor);
+        if(!reduced && Math.random() < .5) blip(150 + Math.random()*200, .022, .01);
+        setTimeout(tick, reduced ? 1 : speed * (.9 + Math.random() * .35));
+      }else{
+        d.textContent = text;
+        if(done) done();
+        setTimeout(res, reduced ? 30 : 180);
+      }
+    })();
+  });
+}
+
+/* длинная интригующая загрузка: 14 команд */
+const SCRIPT = [
+  { text: '> [ SYSTEM ] Жүйені іске қосу... 100%',                    speed: 10, pre: 380 },
+  { text: '> [ KERNEL ] Негізгі ядроны жүктеу... Орындалды.',        speed: 18, pre: 480 },
+  { text: '> [ MEMORY ] Естеліктер архивін ашу...',                  speed: 15, pre: 380 },
+  { text: '> [ MODULE ] Жасанды интеллект модульдері жүктелуде...',  speed: 23, pre: 620 },
+  { text: '> [ NETWORK ] Жүрек дерекқорына қосылу... Сәтті.',        speed: 20, pre: 540, fx: 'ok' },
+  { text: '> [ SECURITY ] Биометриялық тексеру... Расталды.',        speed: 18, pre: 650 },
+  { text: '> [ BYPASS ] Қорғаныс жүйелерін айналып өту... Done.',    speed: 8,  pre: 900 },
+  { text: '> [ SCAN ] Әлемдегі ең сұлу қызды іздеу...',              speed: 33, pre: 950 },
+  { text: '> [ MATCH ] Табылды. Кодтық атауы: Менің махаббатым.',    speed: 20, pre: 540, fx: 'found' },
+  { text: '> [ EXTRACT ] Бірге өткізген бақытты сәттерді жүктеу... 100%', speed: 10, pre: 480 },
+  { text: '> [ ANALYZE ] Сезімдерді талдау басталды...',             speed: 23, pre: 460 },
+  { text: '> [ CALIBRATE ] Жүрек соғысының жиілігін синхрондау... Орындалды.', speed: 20, pre: 650, fx: 'beat' },
+  { text: '> [ OVERLOAD ] Ескерту: Махаббат деңгейі шектен тыс жоғары!', speed: 18, pre: 780, fx: 'warn', cls: 'warn' },
+  { text: '> [ DECODE ] Сезімдерді барлық тілге аудару процесі...',  speed: 20, pre: 950 },
+];
+
+async function runSequence(){
+  await wait(reduced ? 150 : 750);
+  for(const line of SCRIPT){
+    await typeLine(line.text, {
+      speed: line.speed,
+      cls: line.cls,
+      done: () => {
+        if(line.fx === 'ok') fxOk();
+        if(line.fx === 'found') fxFound();
+        if(line.fx === 'beat') fxBeat();
+        if(line.fx === 'warn'){
+          fxWarn();
+          const sc = $('#terminal-scene');
+          sc.classList.remove('danger');
+          void sc.offsetWidth;
+          sc.classList.add('danger');
+          setTimeout(() => sc.classList.remove('danger'), 650);
+        }
+      }
+    });
+    await wait(line.pre);
+  }
+  /* переход к дождю: дождь стартует и «смывает» строки */
+  if(!reduced){
+    startRain();
+    $('#rain').classList.add('on');
+    await wait(450);
+  }
+  $('#terminal').classList.add('washed');
+  await wait(reduced ? 350 : 1500);
+  phrases();
+}
+
+/* ================= MATRIX RAIN (Canvas) ================= */
+let rainRunning = false;
+function startRain(){
+  if(rainRunning) return;
+  rainRunning = true;
+  const cvs = $('#rain');
+  const ctx = cvs.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  const fs = 15;
+  const CH = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホ0123456789ABCDEFЖүрекМахаббат<>/*+#$%@'.split('');
+  let W = 0, H = 0, cols = 0, drops = [], speeds = [];
+
+  function build(){
+    W = innerWidth; H = innerHeight;
+    cvs.width = W*dpr; cvs.height = H*dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.fillStyle = '#020503';
+    ctx.fillRect(0,0,W,H);
+    cols = Math.ceil(W/fs);
+    drops = new Array(cols).fill(0).map(() => Math.random() * (-H/fs) + Math.random()*20);
+    speeds = new Array(cols).fill(0).map(() => .35 + Math.random()*.5);
+  }
+  function frame(){
+    if(!rainRunning) return;
+    /* трейл: полупрозрачная «доска» */
+    ctx.fillStyle = 'rgba(2,5,3,.10)';
+    ctx.fillRect(0,0,W,H);
+    ctx.font = fs + 'px "JetBrains Mono", monospace';
+    for(let i=0;i<cols;i++){
+      const y = drops[i]*fs;
+      if(y > -fs && y < H + fs){
+        const ch = CH[Math.random()*CH.length | 0];
+        const head = Math.random() < .08;
+        ctx.shadowColor = '#3dff7c';
+        ctx.shadowBlur = head ? 8 : 4;
+        ctx.fillStyle = head ? '#eafff0' : (Math.random() < .12 ? '#8affbe' : '#2fd46f');
+        ctx.fillText(ch, i*fs, y);
+        ctx.shadowBlur = 0;
+      }
+      drops[i] += speeds[i];
+      if(y > H && Math.random() > .975) drops[i] = Math.random() * -20;
+    }
+    requestAnimationFrame(frame);
+  }
+  build();
+  addEventListener('resize', build);
+  frame();
+}
+function stopRain(){ rainRunning = false; }
+
+/* ================= СЦЕНА 2: 30 ЯЗЫКОВ, ОЧЕНЬ БЫСТРО ================= */
+const PHRASES = [
+  'I love you',
+  "Je t'aime",
+  'Te amo',
+  'Ich liebe dich',
+  '사랑해',
+  'Ti amo',
+  'Я тебя люблю',
+  'Mahal kita',
+  'Seni seviyorum',
+  'أحبك',
+  '愛してる',
+  'Eu te amo',
+  "Σ' αγαπώ",
+  'Kocham cię',
+  'Szeretlek',
+  'Ik hou van jou',
+  'Rakastan sinua',
+  'আমি তোমায় ভালোবাসি',
+  'ฉันรักเธอ',
+  "T'estimo",
+  'Miluji tě',
+  'Jeg elsker dig',
+  'Minä rakastan sinua',
+  'S\'agapo',
+  'Ani ohev otakh',
+  "Aloha wau ia 'oe",
+  "M'bi fe",
+  'Ngo oi nei',
+  'Волим те',
+  'Мен сені қатты жақсы көремін'
+];
+
+/* размер шрифта под длину фразы */
+function fitPhrase(el, text){
+  let w = 0;
+  for(const ch of text){
+    const c = ch.codePointAt(0);
+    if((c >= 0x2E80 && c <= 0x9FFF) || (c >= 0xAC00 && c <= 0xD7AF) ||
+       (c >= 0x3040 && c <= 0x30FF) || (c >= 0xF900 && c <= 0xFAFF)) w += 1.02;
+    else if(c >= 0x0590 && c <= 0x06FF) w += .52;
+    else if((c >= 0x0300 && c <= 0x036F) || (c >= 0x093E && c <= 0x0951)) w += .08;
+    else w += .62;
+  }
+  const size = Math.min(11, 92 / w);
+  el.style.fontSize = `clamp(1.1rem, ${size}vw, 8rem)`;
+}
+
+async function phrases(){
+  const big = $('#big');
+  for(let i = 0; i < PHRASES.length; i++){
+    const p = PHRASES[i];
+    const isLast = i === PHRASES.length - 1;
+    if(i > 0 && !reduced){
+      big.classList.add('swap-out');   /* алдыңғы сөз плавный еріп кетеді */
+      await wait(95);
+      big.classList.remove('swap-out');
+    }
+    big.textContent = p;
+    fitPhrase(big, p);
+    big.classList.remove('show', 'flick', 'show-final');
+    void big.offsetWidth;
+    if(!isLast){
+      big.classList.add('show', 'flick');
+      await wait(reduced ? 120 : 300 + Math.random()*80);
+    }else{
+      big.classList.add('show-final');
+      await wait(reduced ? 400 : 1500);
+      shatter();
+    }
+  }
+}
+
+/* ================= ШУМ (glitch noise) ================= */
+function makeNoise(){
+  const c = document.createElement('canvas'); c.width = c.height = 160;
+  const x = c.getContext('2d');
+  const img = x.createImageData(160,160);
+  for(let i=0;i<img.data.length;i+=4){
+    const v = Math.random()*255 | 0;
+    img.data[i] = img.data[i+1] = img.data[i+2] = v;
+    img.data[i+3] = 255;
+  }
+  x.putImageData(img,0,0);
+  return c.toDataURL();
+}
+const noiseURL = makeNoise();
+
+/* ================= ТРЕЩИНА ================= */
+function showCrack(){
+  const svg = $('#crack');
+  const w = innerWidth, h = innerHeight;
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  const p1 = svg.querySelector('.c1'), p2 = svg.querySelector('.c2');
+  let x = w*(.5 + (Math.random()-.5)*.12), y = h*.5;
+  let ang = Math.random()*Math.PI*2;
+  let d = `M${x.toFixed(1)} ${y.toFixed(1)}`;
+  let bx = x, by = y, ba = ang;
+  for(let i=0;i<10;i++){
+    ang += (Math.random()-.5)*1.7;
+    const len = 26 + Math.random()*80;
+    x += Math.cos(ang)*len; y += Math.sin(ang)*len;
+    d += ` L${x.toFixed(1)} ${y.toFixed(1)}`;
+    if(i === 4){ bx = x; by = y; ba = ang + (Math.random()<.5 ? 1.2 : -1.2); }
+  }
+  p1.setAttribute('d', d);
+  let bd = `M${bx.toFixed(1)} ${by.toFixed(1)}`;
+  let a2 = ba;
+  for(let i=0;i<5;i++){
+    a2 += (Math.random()-.5)*1.5;
+    const len = 20 + Math.random()*60;
+    bx += Math.cos(a2)*len; by += Math.sin(a2)*len;
+    bd += ` L${bx.toFixed(1)} ${by.toFixed(1)}`;
+  }
+  p2.setAttribute('d', bd);
+  svg.classList.add('on');
+  setTimeout(() => svg.classList.remove('on'), 260);
+}
+
+function makeContentClone(){
+  /* копия визуального контента: строки (уже смыв) + фраза */
+  const wrap = document.createElement('div');
+  const cTerm = $('#terminal').cloneNode(true);
+  const cBig = $('#big').cloneNode(true);
+  wrap.append(cTerm, cBig);
+  wrap.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+  return wrap;
+}
+
+/* ================= СЦЕНА 3: СЛОМ + БЕЛАЯ ВСПЫШКА ================= */
+let shattered = false;
+function shatter(){
+  if(shattered) return;
+  shattered = true;
+  const layer = $('#glitch-layer');
+  layer.innerHTML = '';
+  layer.style.display = 'block';
+
+  if(!reduced){
+    const K = 11;
+    for(let i=0;i<K;i++){
+      const band = document.createElement('div');
+      band.className = 'band';
+      band.appendChild(makeContentClone());
+      const top = i * 100 / K;
+      band.style.clipPath = `inset(${top}% 0 ${100 - top - 100/K}% 0)`;
+      band.style.setProperty('--dx', ((Math.random()*2-1)*52).toFixed(1) + 'px');
+      band.style.setProperty('--dy', ((Math.random()*2-1)*12).toFixed(1) + 'px');
+      band.style.setProperty('--rot', ((Math.random()*2-1)*4).toFixed(2) + 'deg');
+      band.style.animationDelay = (Math.random()*.1).toFixed(3) + 's';
+      layer.appendChild(band);
+    }
+    ['ghost-r','ghost-b'].forEach(cls => {
+      const g = document.createElement('div');
+      g.className = 'ghost ' + cls;
+      g.appendChild(makeContentClone());
+      layer.appendChild(g);
+    });
+    const n = document.createElement('div');
+    n.className = 'glitch-noise';
+    n.style.backgroundImage = `url(${noiseURL})`;
+    layer.appendChild(n);
+    showCrack();
+    document.body.classList.add('shake');
+  }
+  /* оригинальная фраза уходит — её сменят «осколки» */
+  $('#big').classList.add('gone');
+  shatterSound();
+
+  setTimeout(() => $('#flash').classList.add('on'), reduced ? 100 : 640);
+  setTimeout(() => {
+    document.body.classList.remove('shake');
+    $('#flash').classList.remove('on');
+    /* қара экран жаңбырмен бірге баяу, плавный жойылады */
+    $('#terminal-scene').classList.add('fade-out');
+    layer.classList.add('fade');
+    document.body.classList.add('finale');
+    $('#finale-scene').classList.add('active');
+    finalePad();
+    initHeart();
+  }, reduced ? 350 : 950);
+  setTimeout(() => {
+    layer.style.display = 'none';
+    layer.innerHTML = '';
+    stopRain();
+  }, 2400);
+}
+
+/* ================= СЦЕНА 4: НЕОНОВОЕ СЕРДЦЕ ИЗ ЧАСТИЦ ================= */
+let heartStarted = false;
+function initHeart(){
+  if(heartStarted) return;
+  heartStarted = true;
+
+  const cvs = $('#heart-canvas');
+  const ctx = cvs.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let W = 0, H = 0, cx = 0, cy = 0, R = 100;
+  let parts = [], stars = [];
+  const t0 = performance.now();
+
+  /* спрайты: неоново-зелёный -> белый (pre-render, без shadowBlur) */
+  const SPR_N = 6;
+  const sprites = [];
+  for(let i=0;i<SPR_N;i++){
+    const t = i/(SPR_N-1);
+    const r = Math.round(61 + (240-61)*t);
+    const g = 255;
+    const b = Math.round(124 + (240-124)*t);
+    const s = document.createElement('canvas');
+    s.width = s.height = 32;
+    const sc = s.getContext('2d');
+    const grad = sc.createRadialGradient(16,16,0,16,16,16);
+    grad.addColorStop(0, `rgba(${r},${g},${b},1)`);
+    grad.addColorStop(.35, `rgba(${r},${g},${b},.55)`);
+    grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
+    sc.fillStyle = grad;
+    sc.fillRect(0,0,32,32);
+    sprites.push(s);
+  }
+
+  /* свечение сердца — один pre-rendered спрайт (быстрее двух градиентов в кадре) */
+  const GLOW_R0 = 160;               /* R, для которого создан спрайт */
+  const GLOW_SIZE = 680;
+  const glowSpr = document.createElement('canvas');
+  glowSpr.width = glowSpr.height = GLOW_SIZE;
+  (function(){
+    const g = glowSpr.getContext('2d');
+    const c = GLOW_SIZE/2;
+    const outer = g.createRadialGradient(c,c, GLOW_R0*.2, c,c, GLOW_R0*1.95);
+    outer.addColorStop(0, 'rgba(124,58,237,.16)');
+    outer.addColorStop(.5, 'rgba(61,255,124,.06)');
+    outer.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = outer;
+    g.fillRect(0,0,GLOW_SIZE,GLOW_SIZE);
+    const inner = g.createRadialGradient(c,c, 0, c,c, GLOW_R0*1.08);
+    inner.addColorStop(0, 'rgba(61,255,124,.15)');
+    inner.addColorStop(1, 'rgba(61,255,124,0)');
+    g.fillStyle = inner;
+    g.fillRect(0,0,GLOW_SIZE,GLOW_SIZE);
+  })();
+
+  /* неявное уравнение сердца (в матем. координатах остриё внизу: (0,-1)) */
+  const heartF = (x,y) => {
+    const q = x*x + y*y - 1;
+    return q*q*q - x*x*y*y*y;
+  };
+
+  function build(){
+    W = innerWidth; H = innerHeight;
+    cvs.width = W*dpr; cvs.height = H*dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    cx = W/2;
+    cy = H*0.385;
+    R = Math.min(H*0.205, W*0.36);
+
+    parts = [];
+    const mobile = W < 600;
+    const target = Math.min(mobile ? 2600 : 5200,
+                            Math.max(1200, Math.round(Math.PI*R*R*.6/(mobile ? 4.2 : 3.4))));
+    let guard = 0;
+    while(parts.length < target && guard < target*40){
+      guard++;
+      const ux = (Math.random()*2-1)*1.28;
+      const uy = (Math.random()*2.35) - 1.1;
+      if(heartF(ux,uy) <= 0){
+        /* градиент неявной функции ≈ нормаль => объёмное освещение */
+        const q = ux*ux + uy*uy - 1;
+        const g1 = 6*ux*q*q - 2*ux*uy*uy*uy;
+        const g2 = 6*uy*q*q - 3*ux*ux*uy*uy;
+        const gl = Math.hypot(g1,g2) || 1;
+        const nx = g1/gl, ny = g2/gl;
+        const light = Math.max(0, nx*(-.45) + ny*.75);
+        const core = Math.max(0, 1 - Math.hypot(ux*.85, (uy-.15)*.95)/1.25);
+        const lv = Math.min(1, light*.75 + core*.55);
+        parts.push({
+          ux, uy,
+          s: 2.6 + Math.random()*3.4,
+          a: .35 + Math.random()*.5,
+          tw: .5 + Math.random()*1.6,
+          ph: Math.random()*6.283,
+          spr: Math.min(SPR_N-1, Math.round(lv*(SPR_N-1)))
+        });
+      }
+    }
+
+    stars = [];
+    const NS = mobile ? 90 : 150;
+    for(let i=0;i<NS;i++){
+      stars.push({
+        x: Math.random()*W, y: Math.random()*H,
+        r: .4 + Math.random()*1.1,
+        a: .06 + Math.random()*.25,
+        tw: .3 + Math.random()*1.2,
+        ph: Math.random()*6.283
+      });
+    }
+  }
+
+  function draw(t){
+    ctx.clearRect(0,0,W,H);
+
+    /* звёзды (неоновый оттенок) */
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = '#c9ffe0';
+    for(const s of stars){
+      ctx.globalAlpha = s.a * (.65 + .35*Math.sin(t*s.tw + s.ph));
+      ctx.fillRect(s.x, s.y, s.r, s.r);
+    }
+
+    /* медленный пульс + лёгкое дыхание */
+    const pulse = reduced ? 1 : 1 + .05*Math.sin(t*2*Math.PI/1.7);
+    const bob = reduced ? 0 : Math.sin(t*2*Math.PI/7)*4;
+    const S = R*pulse;
+    const hy = cy + bob;
+
+    ctx.globalCompositeOperation = 'lighter';
+    const gd = GLOW_SIZE * (S / GLOW_R0);
+    ctx.globalAlpha = 1;
+    ctx.drawImage(glowSpr, cx - gd/2, hy - gd/2, gd, gd);
+
+    /* частицы: y инвертирована => остриё сердца направлено ВНИЗ */
+    for(const p of parts){
+      const px = cx + p.ux*S;
+      const py = hy - p.uy*S;
+      const tw = reduced ? 1 : .72 + .28*Math.sin(t*p.tw + p.ph);
+      ctx.globalAlpha = Math.min(1, p.a*tw);
+      const d = p.s * (reduced ? 1 : 1 + .15*Math.sin(t*.8 + p.ph));
+      ctx.drawImage(sprites[p.spr], px-d/2, py-d/2, d, d);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  build();
+  addEventListener('resize', () => build());
+
+  if(reduced){
+    draw(0);
+  }else{
+    (function frame(now){
+      if(!heartStarted) return;
+      draw((now - t0)/1000);
+      requestAnimationFrame(frame);
+    })(t0);
+  }
+}
+
+/* ================= СТАРТ ================= */
+const startEl = $('#start');
+startEl.addEventListener('pointerdown', () => {
+  if(startEl.classList.contains('off')) return;
+  initAudio();
+  if(actx && actx.state === 'suspended') actx.resume();
+  startEl.classList.add('off');
+  $('#terminal-scene').classList.add('boot');
+  setTimeout(runSequence, reduced ? 100 : 800);
+});
+
+/* тест-хуки (консоль браузера) */
+window.__demo = {
+  toFinale(){
+    startEl.classList.add('off');
+    $('#terminal-scene').classList.add('fade-out');
+    document.body.classList.add('finale');
+    $('#finale-scene').classList.add('active');
+    initAudio();
+    if(actx && actx.state === 'suspended') actx.resume();
+    finalePad();
+    initHeart();
+  },
+  wash(){
+    /* тест: сразу дождь + смыв строк */
+    startEl.classList.add('off');
+    $('#terminal-scene').classList.add('boot');
+    for(const line of SCRIPT.slice(0, 9)){
+      const d = addLine(line.cls);
+      d.textContent = line.text;
+    }
+    startRain();
+    $('#rain').classList.add('on');
+    setTimeout(() => $('#terminal').classList.add('washed'), 350);
+  },
+  shatter
+};
+})();
+</script>
+</body>
