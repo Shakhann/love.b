@@ -518,7 +518,7 @@ function typeLine(text, {speed=20, cls, done} = {}){
       }else{
         d.textContent = text;
         if(done) done();
-        setTimeout(res, reduced ? 30 : 40);
+        setTimeout(res, reduced ? 30 : 25);
       }
     })();
   });
@@ -526,49 +526,49 @@ function typeLine(text, {speed=20, cls, done} = {}){
 
 /* длинная интригующая загрузка: 14 команд */
 const SCRIPT = [
-  { text: '> [ BOOT ] Жүйені инициализациялау... 100%', speed: 3, pre: 56  },
-  { text: '> [ HARDWARE ] Жүрек соғысының сенсорларын тексеру... OK.', speed: 3, pre: 70  },
-  { text: '> [ MEMORY ] Естеліктер архивін ашу...', speed: 3, pre: 63  },
-  { text: '> [ NETWORK ] Дүниежүзілік сезімдер желісіне қосылу... Сәтті.', speed: 3, pre: 77, fx: 'ok'  },
-  { text: '> [ SECURITY ] Биометриялық тексеру басталды...', speed: 3, pre: 98  },
-  { text: '> [ SCAN ] Көз қарашығын сканерлеу... Сәйкестік табылды.', speed: 5, pre: 140, fx: 'ok'  },
-  { text: '> [ AUTH ] Пароль енгізу: ************', speed: 5, pre: 230  },
-  { text: '> [ DENIED ] Қате пароль. Рұқсат етілмейді.', speed: 6, pre: 280, fx: 'denied', cls: 'warn'  },
-  { text: '> [ HACK ] Қорғаныс жүйелерін бұзу хаттамасын іске қосу...', speed: 3, pre: 168  },
-  { text: '> [ BRUTE-FORCE ] Махаббат кілттерін іздеу... [||||||||||] 100%', speed: 4, pre: 250  },
-  { text: '> [ BYPASS ] Firewall айналып өту... Done.', speed: 3, pre: 63  },
-  { text: '> [ SYSTEM ] Рұқсат етілді.', speed: 5, pre: 210, fx: 'ok'  },
-  { text: '> [ LOAD ] Блок #001: Алғашқы кездесу... Жүктелді.', speed: 4, pre: 80  },
-  { text: '> [ LOAD ] Блок #002: Бірінші күлкі... Жүктелді.', speed: 4, pre: 80  },
-  { text: '> [ LOAD ] Блок #003: Қол ұстасу сәті... Жүктелді.', speed: 4, pre: 90  },
-  { text: '> [ SCAN ] Әлемдегі ең сұлу қызды іздеу процесі іске қосылды...', speed: 6, pre: 280  },
-  { text: '> [ RADAR ] Солтүстік жарты шарды сканерлеу... 0 нәтиже.', speed: 4, pre: 110  },
-  { text: '> [ RADAR ] Оңтүстік жарты шарды сканерлеу... 0 нәтиже.', speed: 4, pre: 110  },
-  { text: '> [ RADAR ] Дәл қазіргі локацияны сканерлеу... 1 объект табылды.', speed: 4, pre: 240, fx: 'ok'  },
-  { text: '> [ MATCH ] Анализ... Сәйкестік: 99.999%', speed: 6, pre: 280, fx: 'found'  },
-  { text: '> [ TARGET ] Объекттің кодтық атауы: "Менің махаббатым".', speed: 6, pre: 250, fx: 'found'  },
-  { text: '> [ CONNECT ] Жүректен жүрекке тікелей арна құру...', speed: 5, pre: 210  },
-  { text: '> [ UPLOAD ] Эмоциялар пакетін жіберу... 45%... 89%... 100%.', speed: 5, pre: 240, fx: 'upload'  },
-  { text: '> [ SYNC ] Ойларды синхрондау...', speed: 3, pre: 84  },
-  { text: '> [ CALIBRATE ] Жүрек соғысының жиілігін калибрлеу...', speed: 5, pre: 270, fx: 'beat'  },
-  { text: '> [ PULSE ] BPM: 85... 95... 110...', speed: 7, pre: 290, fx: 'pulse'  },
-  { text: '> [ WARNING ] Соғу жиілігі тым жоғары.', speed: 7, pre: 270, fx: 'warn', cls: 'caution'  },
-  { text: '> [ PROCESS ] Қамқорлық деңгейін өлшеу... Шексіздік (∞).', speed: 3, pre: 98  },
-  { text: '> [ PROCESS ] Сұлулық индексі... Жүйе есептей алмайды (Overflow).', speed: 4, pre: 161, fx: 'denied'  },
-  { text: '> [ OVERLOAD ] Ескерту: Махаббат деңгейі шектен тыс жоғары!', speed: 7, pre: 320, fx: 'warn', cls: 'warn'  },
-  { text: '> [ OVERLOAD ] Жүйе қызып кетті...', speed: 5, pre: 140, cls: 'warn'  },
-  { text: '> [ ERROR ] Сезімдерді тоқтату мүмкін емес.', speed: 7, pre: 290, fx: 'denied', cls: 'warn'  },
-  { text: '> [ SAVE ] Осы сәтті мәңгілікке сақтау... Saved.', speed: 6, pre: 270, fx: 'ok'  },
-  { text: '> [ FINAL ] Барлық модульдер сәтті орнатылды.', speed: 3, pre: 168, fx: 'ok'  },
-  { text: '> [ INITIATE ] Романтика протоколын қосу.', speed: 5, pre: 280  },
-  { text: '> [ EXECUTE ] Виртуалды қабырғаларды бұзу... 3...', speed: 7, pre: 350, fx: 'count'  },
-  { text: '> [ EXECUTE ] 2...', speed: 7, pre: 240, fx: 'count'  },
-  { text: '> [ EXECUTE ] 1...', speed: 7, pre: 240, fx: 'count'  },
-  { text: '> [ DECODE ] Сезімдерді барлық тілге аудару процесі...', speed: 7, pre: 400, fx: 'found'  },
+  { text: '> [ BOOT ] Жүйені инициализациялау... 100%', speed: 2, pre: 32   },
+  { text: '> [ HARDWARE ] Жүрек соғысының сенсорларын тексеру... OK.', speed: 2, pre: 40   },
+  { text: '> [ MEMORY ] Естеліктер архивін ашу...', speed: 2, pre: 36   },
+  { text: '> [ NETWORK ] Дүниежүзілік сезімдер желісіне қосылу... Сәтті.', speed: 2, pre: 44, fx: 'ok'   },
+  { text: '> [ SECURITY ] Биометриялық тексеру басталды...', speed: 2, pre: 56   },
+  { text: '> [ SCAN ] Көз қарашығын сканерлеу... Сәйкестік табылды.', speed: 3, pre: 80, fx: 'ok'   },
+  { text: '> [ AUTH ] Пароль енгізу: ************', speed: 3, pre: 131   },
+  { text: '> [ DENIED ] Қате пароль. Рұқсат етілмейді.', speed: 3, pre: 160, fx: 'denied', cls: 'warn'   },
+  { text: '> [ HACK ] Қорғаныс жүйелерін бұзу хаттамасын іске қосу...', speed: 2, pre: 96   },
+  { text: '> [ BRUTE-FORCE ] Махаббат кілттерін іздеу... [||||||||||] 100%', speed: 2, pre: 143   },
+  { text: '> [ BYPASS ] Firewall айналып өту... Done.', speed: 2, pre: 36   },
+  { text: '> [ SYSTEM ] Рұқсат етілді.', speed: 3, pre: 120, fx: 'ok'   },
+  { text: '> [ LOAD ] Блок #001: Алғашқы кездесу... Жүктелді.', speed: 2, pre: 46   },
+  { text: '> [ LOAD ] Блок #002: Бірінші күлкі... Жүктелді.', speed: 2, pre: 46   },
+  { text: '> [ LOAD ] Блок #003: Қол ұстасу сәті... Жүктелді.', speed: 2, pre: 51   },
+  { text: '> [ SCAN ] Әлемдегі ең сұлу қызды іздеу процесі іске қосылды...', speed: 3, pre: 160   },
+  { text: '> [ RADAR ] Солтүстік жарты шарды сканерлеу... 0 нәтиже.', speed: 2, pre: 63   },
+  { text: '> [ RADAR ] Оңтүстік жарты шарды сканерлеу... 0 нәтиже.', speed: 2, pre: 63   },
+  { text: '> [ RADAR ] Дәл қазіргі локацияны сканерлеу... 1 объект табылды.', speed: 2, pre: 137, fx: 'ok'   },
+  { text: '> [ MATCH ] Анализ... Сәйкестік: 99.999%', speed: 3, pre: 160, fx: 'found'   },
+  { text: '> [ TARGET ] Объекттің кодтық атауы: "Менің махаббатым".', speed: 3, pre: 143, fx: 'found'   },
+  { text: '> [ CONNECT ] Жүректен жүрекке тікелей арна құру...', speed: 3, pre: 120   },
+  { text: '> [ UPLOAD ] Эмоциялар пакетін жіберу... 45%... 89%... 100%.', speed: 3, pre: 137, fx: 'upload'   },
+  { text: '> [ SYNC ] Ойларды синхрондау...', speed: 2, pre: 48   },
+  { text: '> [ CALIBRATE ] Жүрек соғысының жиілігін калибрлеу...', speed: 3, pre: 154, fx: 'beat'   },
+  { text: '> [ PULSE ] BPM: 85... 95... 110...', speed: 4, pre: 166, fx: 'pulse'   },
+  { text: '> [ WARNING ] Соғу жиілігі тым жоғары.', speed: 4, pre: 154, fx: 'warn', cls: 'caution'   },
+  { text: '> [ PROCESS ] Қамқорлық деңгейін өлшеу... Шексіздік (∞).', speed: 2, pre: 56   },
+  { text: '> [ PROCESS ] Сұлулық индексі... Жүйе есептей алмайды (Overflow).', speed: 2, pre: 92, fx: 'denied'   },
+  { text: '> [ OVERLOAD ] Ескерту: Махаббат деңгейі шектен тыс жоғары!', speed: 4, pre: 183, fx: 'warn', cls: 'warn'   },
+  { text: '> [ OVERLOAD ] Жүйе қызып кетті...', speed: 3, pre: 80, cls: 'warn'   },
+  { text: '> [ ERROR ] Сезімдерді тоқтату мүмкін емес.', speed: 4, pre: 166, fx: 'denied', cls: 'warn'   },
+  { text: '> [ SAVE ] Осы сәтті мәңгілікке сақтау... Saved.', speed: 3, pre: 154, fx: 'ok'   },
+  { text: '> [ FINAL ] Барлық модульдер сәтті орнатылды.', speed: 2, pre: 96, fx: 'ok'   },
+  { text: '> [ INITIATE ] Романтика протоколын қосу.', speed: 3, pre: 160   },
+  { text: '> [ EXECUTE ] Виртуалды қабырғаларды бұзу... 3...', speed: 4, pre: 200, fx: 'count'   },
+  { text: '> [ EXECUTE ] 2...', speed: 4, pre: 137, fx: 'count'   },
+  { text: '> [ EXECUTE ] 1...', speed: 4, pre: 137, fx: 'count'   },
+  { text: '> [ DECODE ] Сезімдерді барлық тілге аудару процесі...', speed: 4, pre: 229, fx: 'found'   },
 ];
 
 async function runSequence(){
-  await wait(reduced ? 150 : 300);
+  await wait(reduced ? 150 : 200);
   for(const line of SCRIPT){
     await typeLine(line.text, {
       speed: line.speed,
@@ -1012,7 +1012,7 @@ startEl.addEventListener('pointerdown', () => {
   if(actx && actx.state === 'suspended') actx.resume();
   startEl.classList.add('off');
   $('#terminal-scene').classList.add('boot');
-  setTimeout(runSequence, reduced ? 100 : 600);
+  setTimeout(runSequence, reduced ? 100 : 400);
 });
 /* ================= RESTART: басынан қайта ================= */
 function restart(){
@@ -1040,7 +1040,7 @@ function restart(){
   document.body.classList.remove('resetting');
   void ts.offsetWidth;
   ts.classList.add('boot');
-  setTimeout(runSequence, reduced ? 100 : 600);
+  setTimeout(runSequence, reduced ? 100 : 400);
 }
 $('#replay').addEventListener('click', restart);
 
